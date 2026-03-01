@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import api from "../../services/api";
 
-export default function Header() {
+export default function Header({ darkMode, setDarkMode }) {
 
   const navigate = useNavigate();
 
@@ -10,9 +10,7 @@ export default function Header() {
     JSON.parse(localStorage.getItem("user"))
   );
 
-  const [dark, setDark] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
+
 
   const [showProfile, setShowProfile] =
     useState(false);
@@ -28,7 +26,6 @@ export default function Header() {
 
         setUser(res.data);
 
-        /* ✅ keep user stored */
         localStorage.setItem(
           "user",
           JSON.stringify(res.data)
@@ -43,18 +40,7 @@ export default function Header() {
 
   }, []);
 
-  /* ===== DARK MODE ===== */
-  useEffect(() => {
 
-    if (dark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme","dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme","light");
-    }
-
-  }, [dark]);
 
   /* ===== CLOSE OUTSIDE CLICK ===== */
   useEffect(() => {
@@ -88,9 +74,15 @@ export default function Header() {
     window.location.reload();
   };
 
-  const name =
+  /* ✅ FULL NAME */
+  const fullName =
     user?.firstName
       ? `${user.firstName} ${user.lastName || ""}`
+      : "User";
+
+  const avatarName =
+    user?.firstName
+      ? `${user.firstName}+${user.lastName || ""}`
       : user?.email || "User";
 
   return (
@@ -150,7 +142,7 @@ export default function Header() {
           >
 
             <img
-              src={`https://ui-avatars.com/api/?background=b08968&color=fff&name=${name}`}
+              src={`https://ui-avatars.com/api/?background=b08968&color=fff&name=${avatarName}`}
               className="w-8 h-8 rounded-full"
               alt="profile"
             />
@@ -159,7 +151,7 @@ export default function Header() {
               text-sm
               text-[#3e2f26]
               dark:text-white">
-              {name}
+              {fullName}
             </span>
           </div>
 
@@ -176,12 +168,13 @@ export default function Header() {
                 Account Details
               </h3>
 
+              {/* ✅ NAME ADDED */}
               <p className="text-sm mt-2 dark:text-gray-300">
-                Email: {user?.email || "Not Available"}
+                Name: {fullName}
               </p>
 
               <p className="text-sm dark:text-gray-300">
-                Phone: {user?.phone || "N/A"}
+                Email: {user?.email || "Not Available"}
               </p>
 
               <p className="text-sm dark:text-gray-300">
@@ -191,13 +184,9 @@ export default function Header() {
               <hr className="my-3" />
 
               <button
-                onClick={() =>
-                  setDark(!dark)
-                }
+                onClick={() => setDarkMode(!darkMode)}
                 className="w-full text-left py-2">
-                {dark
-                  ? "🌙 Dark Mode"
-                  : "☀️ Light Mode"}
+                {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
               </button>
 
               <button

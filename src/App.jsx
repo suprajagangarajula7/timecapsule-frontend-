@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import AuthHome from "./pages/AuthHome";
 import Privacy from "./pages/Privacy";
@@ -14,53 +15,84 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
+
+  /* ✅ GLOBAL THEME STATE */
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
+
+  /* ✅ APPLY THEME TO HTML */
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
+
   return (
     <BrowserRouter>
-      <Routes>
 
-        {/* ================= PUBLIC ROUTES ================= */}
-        <Route path="/" element={<AuthHome />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/contact" element={<Contact />} />
+      {/* ✅ GLOBAL BACKGROUND */}
+      <div className="min-h-screen bg-[#f8f5f1] dark:bg-[#1a1a1a] transition-colors duration-300">
 
-        <Route
-          path="/share/:token"
-          element={
-            <ProtectedRoute>
-              <SharedCapsule />
-            </ProtectedRoute>
-          }
-        />
+        <Routes>
 
-        {/* ================= PROTECTED ROUTES ================= */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <div className="min-h-screen bg-[#f8f5f1]">
-                <Header />
-                <Dashboard />
-              </div>
-            </ProtectedRoute>
-          }
-        />
+          {/* PUBLIC ROUTES */}
+          <Route path="/" element={<AuthHome />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/contact" element={<Contact />} />
 
-        <Route
-          path="/create"
-          element={
-            <ProtectedRoute>
-              <div className="min-h-screen bg-[#f8f5f1]">
-                <Header />
-                <CreateCapsule />
-              </div>
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/share/:token"
+            element={
+              <ProtectedRoute>
+                <SharedCapsule />
+              </ProtectedRoute>
+            }
+          />
 
-      </Routes>
+          {/* DASHBOARD */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                  />
+                  <Dashboard />
+                </>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* CREATE */}
+          <Route
+            path="/create"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                  />
+                  <CreateCapsule />
+                </>
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
+
+      </div>
+
     </BrowserRouter>
   );
 }

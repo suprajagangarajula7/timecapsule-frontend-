@@ -14,7 +14,6 @@ const getRemainingTime = (date) => {
 
 export default function MemoryCard({ capsule, onDelete }) {
 
-  /* ✅ FIX: ALWAYS HANDLE MULTIPLE IMAGES */
   const images =
     typeof capsule.images === "string"
       ? JSON.parse(capsule.images)
@@ -34,7 +33,7 @@ export default function MemoryCard({ capsule, onDelete }) {
     }
   }, []);
 
-  /* ---------- LIVE TIMER ---------- */
+  /* ---------- TIMER ---------- */
   useEffect(() => {
 
     const timer = setInterval(() => {
@@ -83,52 +82,61 @@ export default function MemoryCard({ capsule, onDelete }) {
     <div
       className="
       bg-gradient-to-br
-      from-[#fff7ef]
-      to-[#f8f5f1]
+      from-[#fff7ef] to-[#f8f5f1]
+      dark:from-[#1f1f1f] dark:to-[#2a2a2a]
       border border-[#ece6df]
+      dark:border-gray-700
       rounded-3xl
       shadow-lg
       hover:shadow-2xl
-      transition
-      duration-300
+      transition duration-300
       p-6
       hover:-translate-y-1
     "
     >
 
       {/* TITLE */}
-      <h2 className="text-xl font-serif text-[#3e2f26]">
+      <h2 className="
+        text-xl font-serif
+        text-[#3e2f26]
+        dark:text-white
+      ">
         {capsule.title}
       </h2>
 
       {/* DATE */}
-      <p className="text-sm text-[#7a5c4d] mt-2">
+      <p className="
+        text-sm mt-2
+        text-[#7a5c4d]
+        dark:text-gray-400
+      ">
         Unlocked on{" "}
         {new Date(
           capsule.unlock_at
         ).toLocaleString()}
       </p>
 
-      {/* TIMER / OPEN */}
+      {/* TIMER */}
       <div className="mt-3">
 
         {time.total > 0 ? (
-          <p className="text-[#a07155] font-medium text-sm">
+          <p className="
+            font-medium text-sm
+            text-[#a07155]
+            dark:text-[#d4a373]
+          ">
             🔒 {time.days}d {time.hours}h {time.minutes}m {time.seconds}s
           </p>
         ) : (
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="
-              px-4 py-1.5
-              text-sm
-              rounded-full
+              px-4 py-1.5 text-sm rounded-full
               bg-gradient-to-r
               from-[#b08968]
               to-[#a07155]
               text-white
-              hover:scale-105
-              transition
+              hover:scale-105 transition
             "
           >
             {isOpen ? "Close Memory" : "Open Memory"}
@@ -137,15 +145,14 @@ export default function MemoryCard({ capsule, onDelete }) {
 
       </div>
 
-      {/* MEMORY CONTENT */}
+      {/* MEMORY */}
       {isOpen && time.total <= 0 && (
         <div className="mt-4">
 
-          <p className="text-gray-700 mb-4">
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
             {capsule.message}
           </p>
 
-          {/* ✅ MULTIPLE IMAGES DISPLAY */}
           {images.length > 0 && (
             <div className="grid grid-cols-2 gap-3">
               {images.map((img, i) => (
@@ -154,14 +161,9 @@ export default function MemoryCard({ capsule, onDelete }) {
                   src={img}
                   alt={`memory-${i}`}
                   className="
-                    rounded-xl
-                    h-36
-                    w-full
-                    object-cover
-                    shadow-md
-                    hover:scale-105
-                    transition
-                    duration-300
+                    rounded-xl h-36 w-full
+                    object-cover shadow-md
+                    hover:scale-105 transition
                   "
                 />
               ))}
@@ -171,38 +173,34 @@ export default function MemoryCard({ capsule, onDelete }) {
         </div>
       )}
 
-      {/* ACTION BUTTONS */}
+      {/* ACTIONS */}
       <div className="flex gap-2 mt-5">
 
-        {/* DELETE */}
         <button
           onClick={() => onDelete(capsule.id)}
           className="
-            px-3 py-1
-            text-xs
-            rounded-full
+            px-3 py-1 text-xs rounded-full
             border border-[#d6c3b3]
+            dark:border-gray-600
             text-[#7a5c4d]
+            dark:text-gray-300
             hover:bg-[#f1e7dd]
+            dark:hover:bg-gray-700
             transition
           "
         >
           Delete
         </button>
 
-        {/* SHARE */}
         <button
           onClick={shareCapsule}
           className="
-            px-3 py-1
-            text-xs
-            rounded-full
+            px-3 py-1 text-xs rounded-full
             bg-gradient-to-r
             from-[#b08968]
             to-[#a07155]
             text-white
-            hover:scale-105
-            transition
+            hover:scale-105 transition
           "
         >
           Share

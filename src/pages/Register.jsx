@@ -6,7 +6,10 @@ export default function Register() {
 
   const navigate = useNavigate();
 
+  /* ✅ FORM STATE */
   const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -16,6 +19,7 @@ export default function Register() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  /* ✅ INPUT CHANGE */
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -23,11 +27,18 @@ export default function Register() {
     });
   };
 
+  /* ✅ REGISTER USER */
   const registerUser = async (e) => {
     e.preventDefault();
 
-    if (!form.email || !form.password || !form.confirmPassword) {
-      alert("Please fill all required fields");
+    if (
+      !form.firstName ||
+      !form.lastName ||
+      !form.email ||
+      !form.password ||
+      !form.confirmPassword
+    ) {
+      alert("Fill all fields");
       return;
     }
 
@@ -39,147 +50,94 @@ export default function Register() {
     try {
       setLoading(true);
 
-      // ✅ Send only required fields to backend
       const res = await api.post("/auth/register", {
+        firstName: form.firstName,
+        lastName: form.lastName,
         email: form.email,
         password: form.password
       });
 
       localStorage.setItem("token", res.data.token);
 
-      alert("Welcome to Retrospect 🎉");
+      alert("Welcome 🎉");
       navigate("/dashboard");
 
-    } catch (error) {
-      alert(
-        error.response?.data?.message ||
-        "Registration failed"
-      );
+    } catch (err) {
+      alert(err.response?.data?.message || "Register failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-b from-[#f8f5f1] to-[#f1e7dd]">
+    <div className="min-h-screen flex bg-gray-100 items-center justify-center">
 
-      {/* ================= LEFT SIDE ================= */}
-      <div className="hidden md:flex flex-1 items-center justify-center px-12">
-        <div className="max-w-lg space-y-8">
+      <form
+        onSubmit={registerUser}
+        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-4"
+      >
 
-          <h1 className="text-5xl font-serif text-[#3e2f26] leading-tight">
-            Your stories are safe,
-            <br /> your memories are secure.
-          </h1>
+        <h2 className="text-2xl font-bold text-center">
+          Create Account
+        </h2>
 
-          <p className="text-gray-700 text-lg">
-            Create your vault and preserve memories for the future.
-          </p>
-
-          <div className="space-y-6">
-            <div className="bg-white/70 rounded-2xl p-6 shadow-md border border-[#ece6df]">
-              <p className="italic text-[#7a5c4d] font-medium">
-                “Preserve the Voice of Your Life”
-              </p>
-            </div>
-
-            <div className="bg-white/70 rounded-2xl p-6 shadow-md border border-[#ece6df]">
-              <p className="italic text-[#7a5c4d] font-medium">
-                “How would you feel if you received one?”
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* ================= SIGNUP CARD ================= */}
-      <div className="flex flex-1 items-center justify-center px-6 py-10">
-
-        <form
-          onSubmit={registerUser}
-          className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-[#ece6df] p-8 space-y-5"
-        >
-
-          {/* Header */}
-          <div className="text-center">
-            <h2 className="text-3xl font-serif text-[#3e2f26]">
-              Create Account
-            </h2>
-            <p className="text-sm text-gray-500">
-              Begin your Retrospect journey
-            </p>
-          </div>
-
-          {/* Email */}
+        {/* FIRST + LAST NAME */}
+        <div className="flex gap-3">
           <input
-            name="email"
-            placeholder="Email"
-            value={form.email}
+            name="firstName"
+            placeholder="First Name"
+            value={form.firstName}
             onChange={handleChange}
-            className="w-full border border-[#e5ded6] rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#b08968] outline-none"
+            className="border p-3 w-full rounded"
           />
 
-          {/* Password */}
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              className="w-full border border-[#e5ded6] rounded-lg px-4 py-3 pr-12 focus:ring-2 focus:ring-[#b08968]"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3"
-            >
-              👁
-            </button>
-          </div>
+          <input
+            name="lastName"
+            placeholder="Last Name"
+            value={form.lastName}
+            onChange={handleChange}
+            className="border p-3 w-full rounded"
+          />
+        </div>
 
-          {/* Confirm Password */}
-          <div className="relative">
-            <input
-              type={showConfirm ? "text" : "password"}
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              className="w-full border border-[#e5ded6] rounded-lg px-4 py-3 pr-12 focus:ring-2 focus:ring-[#b08968]"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-3"
-            >
-              👁
-            </button>
-          </div>
+        {/* EMAIL */}
+        <input
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          className="border p-3 w-full rounded"
+        />
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-[#b08968] to-[#a07155] text-white font-medium hover:scale-[1.02] transition shadow-md disabled:opacity-60"
-          >
-            {loading ? "Creating Account..." : "Sign Up"}
-          </button>
+        {/* PASSWORD */}
+        <input
+          type={showPassword ? "text" : "password"}
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          className="border p-3 w-full rounded"
+        />
 
-          {/* Footer */}
-          <p className="text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <span
-              onClick={() => navigate("/login")}
-              className="text-[#b08968] cursor-pointer hover:underline"
-            >
-              Log In
-            </span>
-          </p>
+        {/* CONFIRM PASSWORD */}
+        <input
+          type={showConfirm ? "text" : "password"}
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          className="border p-3 w-full rounded"
+        />
 
-        </form>
-      </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-black text-white w-full py-3 rounded"
+        >
+          {loading ? "Creating..." : "Sign Up"}
+        </button>
+
+      </form>
     </div>
   );
 }

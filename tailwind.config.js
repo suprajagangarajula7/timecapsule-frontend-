@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"],
+  darkMode: "class",   // ✅ FIXED
   content: [
     "./index.html",
     "./src/**/*.{js,jsx}",
@@ -14,4 +14,4 @@ export default {
     },
   },
   plugins: [],
-}
+};
