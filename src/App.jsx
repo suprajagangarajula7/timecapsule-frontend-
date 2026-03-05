@@ -5,6 +5,7 @@ import AuthHome from "./pages/AuthHome";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
+import MemoryDetails from "./pages/MemoryDetails";
 
 import SharedCapsule from "./pages/SharedCapsule";
 import Header from "./components/layout/Header";
@@ -72,6 +73,21 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+                    {/* MEMORY DETAILS */}
+          <Route
+            path="/capsule/:id"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                  />
+                  <MemoryDetails />
+                </>
+              </ProtectedRoute>
+            }
+          />
 
           {/* CREATE */}
           <Route
@@ -88,6 +104,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          
 
         </Routes>
 

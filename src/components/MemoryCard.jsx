@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ added
 
 /* ---------- COUNTDOWN ---------- */
 const getRemainingTime = (date) => {
@@ -14,6 +15,8 @@ const getRemainingTime = (date) => {
 
 export default function MemoryCard({ capsule, onDelete }) {
 
+  const navigate = useNavigate(); // ✅ added
+
   const images =
     typeof capsule.images === "string"
       ? JSON.parse(capsule.images)
@@ -23,7 +26,6 @@ export default function MemoryCard({ capsule, onDelete }) {
     getRemainingTime(capsule.unlock_at)
   );
 
-  const [isOpen, setIsOpen] = useState(false);
   const notified = useRef(false);
 
   /* ---------- NOTIFICATION ---------- */
@@ -129,7 +131,7 @@ export default function MemoryCard({ capsule, onDelete }) {
           </p>
         ) : (
           <button
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => navigate(`/capsule/${capsule.id}`)}  // ✅ changed
             className="
               px-4 py-1.5 text-sm rounded-full
               bg-gradient-to-r
@@ -139,39 +141,11 @@ export default function MemoryCard({ capsule, onDelete }) {
               hover:scale-105 transition
             "
           >
-            {isOpen ? "Close Memory" : "Open Memory"}
+            Open Memory
           </button>
         )}
 
       </div>
-
-      {/* MEMORY */}
-      {isOpen && time.total <= 0 && (
-        <div className="mt-4">
-
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            {capsule.message}
-          </p>
-
-          {images.length > 0 && (
-            <div className="grid grid-cols-2 gap-3">
-              {images.map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  alt={`memory-${i}`}
-                  className="
-                    rounded-xl h-36 w-full
-                    object-cover shadow-md
-                    hover:scale-105 transition
-                  "
-                />
-              ))}
-            </div>
-          )}
-
-        </div>
-      )}
 
       {/* ACTIONS */}
       <div className="flex gap-2 mt-5">
