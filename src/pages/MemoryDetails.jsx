@@ -5,235 +5,197 @@ import api from "../services/api";
 export default function MemoryDetails() {
 
   const { id } = useParams();
-  const [capsule, setCapsule] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [passwordInput, setPasswordInput] = useState("");
-  const [authorized, setAuthorized] = useState(false);
-  const [timeLeft, setTimeLeft] = useState("");
 
-  useEffect(() => {
-    fetchCapsule();
-  }, []);
-  
-  useEffect(() => {
-  if (capsule) {
-    setAuthorized(false);
-  }
-}, [capsule]);
-
-  useEffect(() => {
-    if (!capsule || !capsule.is_locked) return;
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const unlock = new Date(capsule.unlock_at);
-      const diff = unlock - now;
-
-      if (diff <= 0) {
-        clearInterval(interval);
-        fetchCapsule();
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-
-      setTimeLeft(
-        `${days}d ${hours}h ${minutes}m ${seconds}s`
-      );
-
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [capsule]);
-
- const fetchCapsule = async () => {
-  try {
-    const res = await api.get(`/capsules/${id}`);
-    console.log("CAPSULE DATA:", res.data); // 👈 ADD THIS
-    setCapsule(res.data);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
+  const [capsule,setCapsule] = useState(null);
+  const [loading,setLoading] = useState(true);
+  const [enteredPassword,setEnteredPassword] = useState("");
+  const [accessGranted,setAccessGranted] = useState(false);
+  const [error,setError] = useState("");
+const playUnlockSound = () => {
+  const audio = new Audio("/unlock.mp3");
+  audio.play();
 };
 
-  if (loading)
-    return <p className="p-10 dark:text-white">Loading...</p>;
+  useEffect(()=>{
 
-  if (!capsule)
-    return <p className="p-10 dark:text-white">Not Found</p>;
+    const fetchCapsule = async ()=>{
 
-  const images = capsule.images || [];
-  const videos = capsule.videos || [];
-  const audios = capsule.audios || [];
+      try{
 
- // 🔒 STILL LOCKED BY TIME
-if (capsule.is_locked) {
-  return (
-    <div className="
-      min-h-screen flex items-center justify-center
-      bg-gradient-to-b from-[#f8f5f1] to-[#f1e7dd]
-      dark:from-[#121212] dark:to-[#1c1c1c]
-      px-6
-    ">
-      <div className="
-        bg-white dark:bg-[#1f1f1f]
-        p-8 rounded-3xl shadow-2xl
-        text-center max-w-md w-full
-      ">
-        <h2 className="text-2xl font-serif mb-4 dark:text-white">
-          🔒 Memory Locked
-        </h2>
+        const res = await api.get(`/capsules/${id}`);
 
-        <p className="text-gray-600 dark:text-gray-300 mb-4">
-          Unlocks in:
-        </p>
+        setCapsule(res.data);
 
-        <div className="text-xl font-bold mb-6 text-[#b08968]">
-          {timeLeft}
-        </div>
-      </div>
-    </div>
-  );
-}
+        if(!res.data.password){
+          setAccessGranted(true);
+        }
 
-// 🔐 PASSWORD PROTECTION (ONLY AFTER UNLOCK TIME PASSED)
-if (!capsule.is_locked && capsule.password && !authorized) {
-  return (
-    <div className="
-      min-h-screen flex items-center justify-center
-      bg-gradient-to-b from-[#f8f5f1] to-[#f1e7dd]
-      dark:from-[#121212] dark:to-[#1c1c1c]
-      px-6
-    ">
-      <div className="
-        bg-white dark:bg-[#1f1f1f]
-        p-8 rounded-3xl shadow-2xl
-        max-w-md w-full text-center
-      ">
-        <h2 className="text-2xl font-serif mb-6 dark:text-white">
-          🔐 Enter Password
-        </h2>
+      }catch(err){
+        console.log(err);
+      }
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={passwordInput}
-          onChange={(e) => setPasswordInput(e.target.value)}
-          className="w-full mb-4 p-3 rounded-xl border dark:bg-gray-800 dark:text-white"
-        />
+      setLoading(false);
+    };
 
-        <button
-          onClick={() => {
-            if (passwordInput === capsule.password) {
-              setAuthorized(true);
-            } else {
-              alert("Incorrect password");
-            }
-          }}
-          className="
-            w-full py-3 rounded-full text-white
-            bg-gradient-to-r from-[#b08968] to-[#a07155]
-            hover:scale-[1.02] transition
-          "
-        >
-          Unlock Memory
-        </button>
-      </div>
-    </div>
-  );
-}
+    fetchCapsule();
 
-  /* 🌸 UNLOCKED VIEW */
-  return (
-    <div className="
-      min-h-screen px-6 md:px-16 py-12
-      bg-gradient-to-b from-[#f8f5f1] to-[#f1e7dd]
-      dark:from-[#121212] dark:to-[#1c1c1c]
-    ">
+  },[id]);
+  useEffect(() => {
 
-      <div className="
-        max-w-4xl mx-auto
-        bg-white dark:bg-[#1f1f1f]
-        p-8 md:p-12
-        rounded-3xl shadow-2xl
-      ">
+  if (!capsule?.is_locked && accessGranted) {
+    playUnlockSound();
+  }
 
-        <h1 className="text-3xl font-serif mb-6 dark:text-white">
+}, [accessGranted]);
+
+  if(loading)
+    return <div className="p-10 text-center">Loading...</div>;
+
+  if(!capsule)
+    return <div className="p-10 text-center">Memory not found</div>;
+
+  const handleUnlock = ()=>{
+
+  if(enteredPassword === capsule.password){
+
+    setAccessGranted(true);
+    setError("");
+
+    playUnlockSound(); // 🔊 play sound
+
+  }else{
+    setError("Incorrect password");
+  }
+
+};
+
+  return(
+
+    <div className="min-h-screen flex justify-center items-center px-4 bg-[#f8f5f1] dark:bg-[#121212]">
+
+      <div className="w-full max-w-3xl bg-white dark:bg-[#1f1f1f] shadow-xl rounded-3xl p-6 border border-[#ece6df] dark:border-gray-700">
+
+        <h1 className="text-2xl font-serif mb-4 text-[#3e2f26] dark:text-white">
           {capsule.title}
         </h1>
 
-        <p className="text-gray-600 dark:text-gray-300 mb-8">
-          {capsule.message}
-        </p>
-
-        {/* 📍 Location Map */}
-        {capsule.latitude !== null && capsule.longitude !== null && (
-          <div className="mb-8">
-            <h3 className="mb-3 font-semibold dark:text-white">
-              📍 Memory Location
-            </h3>
-
-            <iframe
-              title="map"
-              width="100%"
-              height="300"
-              className="rounded-xl"
-              loading="lazy"
-              src={`https://maps.google.com/maps?q=${capsule.latitude},${capsule.longitude}&z=15&output=embed`}
-            />
+        {/* LOCKED BY TIME */}
+        {capsule.is_locked && (
+          <div className="text-red-500 mb-4">
+            🔒 This memory unlocks at {new Date(capsule.unlock_at).toLocaleString()}
           </div>
         )}
 
-        {/* IMAGES */}
-        {images.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {images.map((img, i) => (
+        {/* PASSWORD SCREEN */}
+        {!capsule.is_locked && capsule.password && !accessGranted && (
+
+          <div className="mt-4 bg-gradient-to-br from-[#fff7ef] to-[#f8f5f1] dark:from-[#1f1f1f] dark:to-[#2a2a2a] p-6 rounded-2xl border border-[#ece6df] dark:border-gray-700">
+
+            <p className="text-[#7a5c4d] dark:text-gray-300 mb-4">
+              🔑 This capsule is password protected
+            </p>
+
+            <input
+              type="password"
+              placeholder="Enter password"
+              value={enteredPassword}
+              onChange={(e)=>setEnteredPassword(e.target.value)}
+              className="w-full border border-[#e5d5c5] dark:border-gray-600 rounded-xl px-4 py-2 bg-white dark:bg-[#1a1a1a] text-[#3e2f26] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#b08968]"
+            />
+
+            <button
+              onClick={handleUnlock}
+              className="mt-4 px-6 py-2 rounded-xl text-white bg-gradient-to-r from-[#b08968] to-[#9c6644] hover:scale-105 transition"
+            >
+              Unlock Memory
+            </button>
+
+            {error && <p className="text-red-500 mt-2">{error}</p>}
+
+          </div>
+        )}
+
+        {/* CONTENT */}
+        {!capsule.is_locked && accessGranted && (
+
+          <div className="space-y-6 mt-4">
+
+            <p className="text-gray-700 dark:text-gray-300">
+              {capsule.message}
+            </p>
+
+            {/* IMAGES */}
+            {capsule.images && capsule.images.map((img,i)=>(
               <img
                 key={i}
                 src={img}
                 alt=""
-                className="rounded-xl shadow-md"
+                className="rounded-xl w-full shadow-md"
               />
             ))}
-          </div>
-        )}
 
-        {/* VIDEOS */}
-        {videos.length > 0 && (
-          <div className="space-y-6 mb-8">
-            {videos.map((video, i) => (
+            {/* VIDEOS */}
+            {capsule.videos && capsule.videos.map((vid,i)=>(
               <video
                 key={i}
+                src={vid}
                 controls
                 className="w-full rounded-xl shadow-md"
-              >
-                <source src={video} />
-              </video>
+              />
             ))}
-          </div>
-        )}
 
-        {/* AUDIOS */}
-        {audios.length > 0 && (
-          <div className="space-y-6">
-            {audios.map((audio, i) => (
-              <audio
-                key={i}
-                controls
-                className="w-full"
-              >
-                <source src={audio} />
-              </audio>
-            ))}
+            {/* AUDIOS */}
+{capsule.audios && capsule.audios.map((aud, i) => (
+  <div
+    key={i}
+    className="
+      bg-[#f9f6f2]
+      border border-[#e6ddd4]
+      rounded-xl
+      p-4
+      shadow-sm
+      hover:shadow-md
+      transition
+    "
+  >
+    <p className="text-sm text-[#6b4f3b] mb-2 font-medium">
+      🎙 Voice Memory
+    </p>
+
+    <audio
+      src={aud}
+      controls
+      className="w-full"
+    />
+  </div>
+))}
+
+            {/* LOCATION */}
+            {capsule.latitude && capsule.longitude && (
+
+              <div>
+
+                <p className="font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  📍 Location
+                </p>
+
+                <iframe
+                  title="map"
+                  width="100%"
+                  height="300"
+                  className="rounded-xl"
+                  loading="lazy"
+                  src={`https://maps.google.com/maps?q=${capsule.latitude},${capsule.longitude}&z=15&output=embed`}
+                ></iframe>
+
+              </div>
+            )}
+
           </div>
         )}
 
       </div>
+
     </div>
   );
 }

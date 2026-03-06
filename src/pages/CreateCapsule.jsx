@@ -11,6 +11,7 @@ export default function CreateCapsule() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [audioURL, setAudioURL] = useState(null);
   const [isPublic, setIsPublic] = useState(false);
   const [password, setPassword] = useState("");
   const [location, setLocation] = useState(null);
@@ -50,21 +51,25 @@ export default function CreateCapsule() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
 
-        if (blob.size === 0) {
-          alert("Recording failed.");
-          return;
-        }
+  const blob = new Blob(chunksRef.current, { type: "audio/webm" });
 
-        const recordedFile = new File(
-          [blob],
-          `recording-${Date.now()}.webm`,
-          { type: "audio/webm" }
-        );
+  if (blob.size === 0) {
+    alert("Recording failed.");
+    return;
+  }
 
-        setFiles(prev => [...prev, recordedFile]);
-      };
+  const url = URL.createObjectURL(blob);
+  setAudioURL(url); // 👈 this enables audio preview
+
+  const recordedFile = new File(
+    [blob],
+    `recording-${Date.now()}.webm`,
+    { type: "audio/webm" }
+  );
+
+  setFiles(prev => [...prev, recordedFile]);
+};
 
       mediaRecorder.start();
       setRecording(true);
@@ -201,7 +206,7 @@ export default function CreateCapsule() {
         {/* 🔐 Public Toggle */}
         <div className="mb-6 flex items-center justify-between">
           <span className="dark:text-white font-medium">
-            Make Capsule Public
+            Make memory Public
           </span>
 
           <button
@@ -253,32 +258,69 @@ export default function CreateCapsule() {
           className="mb-6 dark:text-white"
         />
 
-        {/* Recording */}
-        <div className="mb-6">
-          {!recording ? (
-            <button
-              onClick={startRecording}
-              className="
-                w-full py-3 rounded-xl
-                bg-gradient-to-r from-[#b08968] to-[#a07155]
-                text-white shadow-md hover:scale-[1.02] transition
-              "
-            >
-              🎙 Start Recording
-            </button>
-          ) : (
-            <button
-              onClick={stopRecording}
-              className="
-                w-full py-3 rounded-xl
-                bg-gradient-to-r from-red-500 to-red-700
-                animate-pulse text-white shadow-md
-              "
-            >
-              ⏹ Recording... Click to Stop
-            </button>
-          )}
-        </div>
+        
+  {/* Recording */}
+<div className="mb-6 space-y-4">
+
+  {/* Start Recording */}
+  {!recording && !audioURL && (
+    <button
+      onClick={startRecording}
+      className="
+        w-full py-3 rounded-xl
+        bg-gradient-to-r from-[#b08968] to-[#a07155]
+        text-white shadow-md
+        flex items-center justify-center gap-2
+        hover:scale-[1.02] transition
+      "
+    >
+      🎙 Start Recording
+    </button>
+  )}
+
+  {/* Recording State */}
+  {recording && (
+    <div className="flex flex-col items-center gap-4">
+
+      {/* Mic Animation */}
+      <div className="text-4xl animate-pulse">
+        🎤
+      </div>
+
+      <button
+        onClick={stopRecording}
+        className="
+          w-full py-3 rounded-xl
+          bg-gradient-to-r from-[#b08968] to-[#a07155]
+          text-white shadow-md
+          flex items-center justify-center gap-2
+          hover:scale-[1.02] transition
+        "
+      >
+        ⏹ Stop Recording
+      </button>
+
+    </div>
+  )}
+
+  {/* Play Recording */}
+  {audioURL && (
+    <div className="space-y-3">
+
+      <p className="text-sm text-[#7a5c4d] dark:text-gray-300">
+        🎧 Preview Recording
+      </p>
+
+      <audio
+        src={audioURL}
+        controls
+        className="w-full"
+      />
+
+    </div>
+  )}
+
+</div>
 
         {/* Date Time */}
         <input

@@ -11,6 +11,7 @@ import SharedCapsule from "./pages/SharedCapsule";
 import Header from "./components/layout/Header";
 import Dashboard from "./pages/Dashboard";
 import CreateCapsule from "./pages/CreateCapsule";
+import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -104,6 +105,23 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <>
+        <Header
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
+        <Profile
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
+      </>
+    </ProtectedRoute>
+  }
+/>
           
 
         </Routes>
