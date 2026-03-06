@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ added
+import { useNavigate } from "react-router-dom";
 
 /* ---------- COUNTDOWN ---------- */
 const getRemainingTime = (date) => {
@@ -15,7 +15,7 @@ const getRemainingTime = (date) => {
 
 export default function MemoryCard({ capsule, onDelete }) {
 
-  const navigate = useNavigate(); // ✅ added
+  const navigate = useNavigate();
 
   const images =
     typeof capsule.images === "string"
@@ -81,8 +81,10 @@ export default function MemoryCard({ capsule, onDelete }) {
   };
 
   return (
+
     <div
       className="
+      w-full
       bg-gradient-to-br
       from-[#fff7ef] to-[#f8f5f1]
       dark:from-[#1f1f1f] dark:to-[#2a2a2a]
@@ -92,23 +94,27 @@ export default function MemoryCard({ capsule, onDelete }) {
       shadow-lg
       hover:shadow-2xl
       transition duration-300
-      p-6
+      p-4 sm:p-5 md:p-6
       hover:-translate-y-1
+      flex flex-col
+      gap-3
     "
     >
 
       {/* TITLE */}
       <h2 className="
-        text-xl font-serif
+        text-lg sm:text-xl md:text-2xl
+        font-serif
         text-[#3e2f26]
         dark:text-white
+        break-words
       ">
         {capsule.title}
       </h2>
 
       {/* DATE */}
       <p className="
-        text-sm mt-2
+        text-xs sm:text-sm
         text-[#7a5c4d]
         dark:text-gray-400
       ">
@@ -119,11 +125,12 @@ export default function MemoryCard({ capsule, onDelete }) {
       </p>
 
       {/* TIMER */}
-      <div className="mt-3">
+      <div>
 
         {time.total > 0 ? (
           <p className="
-            font-medium text-sm
+            font-medium
+            text-xs sm:text-sm
             text-[#a07155]
             dark:text-[#d4a373]
           ">
@@ -131,14 +138,18 @@ export default function MemoryCard({ capsule, onDelete }) {
           </p>
         ) : (
           <button
-            onClick={() => navigate(`/capsule/${capsule.id}`)}  // ✅ changed
+            onClick={() => navigate(`/capsule/${capsule.id}`)}
             className="
-              px-4 py-1.5 text-sm rounded-full
+              px-4 py-2
+              text-xs sm:text-sm
+              rounded-full
               bg-gradient-to-r
               from-[#b08968]
               to-[#a07155]
               text-white
-              hover:scale-105 transition
+              hover:scale-105
+              transition
+              w-fit
             "
           >
             Open Memory
@@ -148,12 +159,19 @@ export default function MemoryCard({ capsule, onDelete }) {
       </div>
 
       {/* ACTIONS */}
-      <div className="flex gap-2 mt-5">
+      <div className="
+        flex
+        flex-wrap
+        gap-2
+        mt-2
+      ">
 
         <button
           onClick={() => onDelete(capsule.id)}
           className="
-            px-3 py-1 text-xs rounded-full
+            px-3 py-1.5
+            text-xs sm:text-sm
+            rounded-full
             border border-[#d6c3b3]
             dark:border-gray-600
             text-[#7a5c4d]
@@ -169,12 +187,15 @@ export default function MemoryCard({ capsule, onDelete }) {
         <button
           onClick={shareCapsule}
           className="
-            px-3 py-1 text-xs rounded-full
+            px-3 py-1.5
+            text-xs sm:text-sm
+            rounded-full
             bg-gradient-to-r
             from-[#b08968]
             to-[#a07155]
             text-white
-            hover:scale-105 transition
+            hover:scale-105
+            transition
           "
         >
           Share
@@ -183,5 +204,7 @@ export default function MemoryCard({ capsule, onDelete }) {
       </div>
 
     </div>
+
   );
 }
+

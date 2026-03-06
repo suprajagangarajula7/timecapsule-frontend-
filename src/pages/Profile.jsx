@@ -92,8 +92,6 @@ export default function Profile() {
   };
 
 
-  /* ================= LOADING ================= */
-
   if(loading)
     return (
       <div className="p-10 text-center dark:text-white">
@@ -102,25 +100,62 @@ export default function Profile() {
     );
 
 
-  /* ================= UI ================= */
+  const avatarName = `${formData.firstName}+${formData.lastName}`;
 
   return (
 
-<div className="min-h-screen bg-[#f8f5f1] dark:bg-[#121212] transition-colors duration-300">
+<div className="
+min-h-screen
+bg-gradient-to-b
+from-[#f8f5f1] to-[#f1e7dd]
+dark:from-[#121212] dark:to-[#1c1c1c]
+px-4 sm:px-6
+py-10
+">
 
-<div className="max-w-xl mx-auto mt-14 bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg">
+<div className="
+max-w-xl
+mx-auto
+bg-white
+dark:bg-gray-900
+p-6 sm:p-8
+rounded-3xl
+shadow-xl
+border border-[#ece6df]
+dark:border-gray-700
+">
 
-<h2 className="text-3xl font-serif font-bold mb-6 text-[#3b2a21] dark:text-white">
+<h2 className="
+text-2xl sm:text-3xl
+font-serif
+font-bold
+mb-6
+text-[#3b2a21]
+dark:text-white
+text-center
+">
 Edit Profile
 </h2>
 
+{/* Avatar */}
+
+<div className="flex justify-center mb-6">
+
+<img
+src={`https://ui-avatars.com/api/?background=b08968&color=fff&name=${avatarName}`}
+className="w-20 h-20 rounded-full shadow"
+/>
+
+</div>
 
 <form
 onSubmit={handleSubmit}
-className="space-y-5"
+className="space-y-4"
 >
 
-{/* FIRST NAME */}
+{/* FIRST + LAST NAME */}
+
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
 <input
 name="firstName"
@@ -128,16 +163,13 @@ value={formData.firstName}
 onChange={handleChange}
 placeholder="First Name"
 className="
-w-full p-3 border rounded-lg
+w-full p-3 border rounded-xl
 focus:ring-2 focus:ring-[#b08968]
 outline-none
 dark:bg-gray-800
 dark:text-white
 "
 />
-
-
-{/* LAST NAME */}
 
 <input
 name="lastName"
@@ -145,13 +177,15 @@ value={formData.lastName}
 onChange={handleChange}
 placeholder="Last Name"
 className="
-w-full p-3 border rounded-lg
+w-full p-3 border rounded-xl
 focus:ring-2 focus:ring-[#b08968]
 outline-none
 dark:bg-gray-800
 dark:text-white
 "
 />
+
+</div>
 
 
 {/* EMAIL */}
@@ -162,7 +196,7 @@ value={formData.email}
 onChange={handleChange}
 placeholder="Email"
 className="
-w-full p-3 border rounded-lg
+w-full p-3 border rounded-xl
 focus:ring-2 focus:ring-[#b08968]
 outline-none
 dark:bg-gray-800
@@ -180,7 +214,7 @@ value={formData.password}
 onChange={handleChange}
 placeholder="New Password (optional)"
 className="
-w-full p-3 border rounded-lg
+w-full p-3 border rounded-xl
 focus:ring-2 focus:ring-[#b08968]
 outline-none
 dark:bg-gray-800
@@ -199,10 +233,11 @@ bg-gradient-to-r
 from-[#b08968]
 to-[#9c6644]
 text-white
-rounded-lg
+rounded-full
 font-medium
-hover:opacity-90
+hover:scale-[1.02]
 transition
+shadow-md
 "
 >
 

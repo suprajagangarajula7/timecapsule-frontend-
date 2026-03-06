@@ -11,10 +11,12 @@ export default function MemoryDetails() {
   const [enteredPassword,setEnteredPassword] = useState("");
   const [accessGranted,setAccessGranted] = useState(false);
   const [error,setError] = useState("");
-const playUnlockSound = () => {
-  const audio = new Audio("/unlock.mp3");
-  audio.play();
-};
+  const [summary,setSummary] = useState("");
+
+  const playUnlockSound = () => {
+    const audio = new Audio("/unlock.mp3");
+    audio.play().catch(()=>{});
+  };
 
   useEffect(()=>{
 
@@ -40,13 +42,14 @@ const playUnlockSound = () => {
     fetchCapsule();
 
   },[id]);
+
   useEffect(() => {
 
-  if (!capsule?.is_locked && accessGranted) {
-    playUnlockSound();
-  }
+    if (!capsule?.is_locked && accessGranted) {
+      playUnlockSound();
+    }
 
-}, [accessGranted]);
+  }, [accessGranted]);
 
   if(loading)
     return <div className="p-10 text-center">Loading...</div>;
@@ -54,20 +57,32 @@ const playUnlockSound = () => {
   if(!capsule)
     return <div className="p-10 text-center">Memory not found</div>;
 
-  const handleUnlock = ()=>{
+  const handleUnlock = () => {
 
-  if(enteredPassword === capsule.password){
+    if (enteredPassword === capsule.password) {
 
-    setAccessGranted(true);
-    setError("");
+      setAccessGranted(true);
+      setError("");
 
-    playUnlockSound(); // 🔊 play sound
+      const audio = new Audio("/unlock.mp3");
+      audio.play().catch(()=>{});
 
-  }else{
-    setError("Incorrect password");
-  }
+    } else {
+      setError("Incorrect password");
+    }
 
-};
+  };
+
+  const generateSummary = () => {
+
+    if (!capsule?.message) return;
+
+    const sentences = capsule.message.split(".");
+    const shortSummary = sentences.slice(0,2).join(".");
+
+    setSummary(shortSummary);
+
+  };
 
   return(
 
@@ -124,6 +139,8 @@ const playUnlockSound = () => {
               {capsule.message}
             </p>
 
+            
+
             {/* IMAGES */}
             {capsule.images && capsule.images.map((img,i)=>(
               <img
@@ -145,30 +162,22 @@ const playUnlockSound = () => {
             ))}
 
             {/* AUDIOS */}
-{capsule.audios && capsule.audios.map((aud, i) => (
-  <div
-    key={i}
-    className="
-      bg-[#f9f6f2]
-      border border-[#e6ddd4]
-      rounded-xl
-      p-4
-      shadow-sm
-      hover:shadow-md
-      transition
-    "
-  >
-    <p className="text-sm text-[#6b4f3b] mb-2 font-medium">
-      🎙 Voice Memory
-    </p>
+            {capsule.audios && capsule.audios.map((aud,i)=>(
+              <div
+                key={i}
+                className="bg-[#f9f6f2] border border-[#e6ddd4] rounded-xl p-4 shadow-sm hover:shadow-md transition"
+              >
+                <p className="text-sm text-[#6b4f3b] mb-2 font-medium">
+                  🎙 Voice Memory
+                </p>
 
-    <audio
-      src={aud}
-      controls
-      className="w-full"
-    />
-  </div>
-))}
+                <audio
+                  src={aud}
+                  controls
+                  className="w-full"
+                />
+              </div>
+            ))}
 
             {/* LOCATION */}
             {capsule.latitude && capsule.longitude && (
@@ -189,13 +198,53 @@ const playUnlockSound = () => {
                 ></iframe>
 
               </div>
+
+            )}
+
+            {/* AI BUTTON */}
+            <button
+              onClick={generateSummary}
+              className="
+                px-6 py-2
+                rounded-xl
+                text-white
+                font-medium
+                bg-gradient-to-r
+                from-[#b08968]
+                to-[#9c6644]
+                hover:scale-105
+                hover:shadow-lg
+                transition
+              "
+            >
+              ✨ Generate AI Summary
+            </button>
+
+            {/* AI SUMMARY SEPARATE CARD */}
+            {summary && (
+
+              <div className="mt-6 bg-gradient-to-br from-[#fff7ef] to-[#f8f5f1] dark:from-[#1f1f1f] dark:to-[#2a2a2a] p-6 rounded-2xl border border-[#ece6df] dark:border-gray-700">
+
+                <h2 className="text-lg font-semibold mb-3 text-[#3e2f26] dark:text-white">
+                  ✨ AI Memory Summary
+                </h2>
+
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {summary}
+                </p>
+
+              </div>
+
             )}
 
           </div>
+
         )}
 
       </div>
 
     </div>
+
   );
+
 }

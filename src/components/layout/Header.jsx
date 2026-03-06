@@ -11,43 +11,28 @@ export default function Header({ darkMode, setDarkMode }) {
   );
 
   const [showProfile, setShowProfile] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [saving,setSaving] = useState(false);
-
-  const [formData, setFormData] = useState({
-    firstName:"",
-    lastName:"",
-    email:"",
-    password:""
-  });
 
   const profileRef = useRef(null);
 
-  /* ================= FETCH USER ================= */
 
-  useEffect(()=>{
+  /* FETCH USER */
 
-    const fetchUser = async()=>{
+  useEffect(() => {
 
-      try{
+    const fetchUser = async () => {
+
+      try {
 
         const res = await api.get("/auth/me");
 
         setUser(res.data);
-
-        setFormData({
-          firstName:res.data.firstName || "",
-          lastName:res.data.lastName || "",
-          email:res.data.email || "",
-          password:""
-        });
 
         localStorage.setItem(
           "user",
           JSON.stringify(res.data)
         );
 
-      }catch{
+      } catch {
         console.log("User fetch failed");
       }
 
@@ -55,75 +40,35 @@ export default function Header({ darkMode, setDarkMode }) {
 
     fetchUser();
 
-  },[]);
+  }, []);
 
-  /* ================= CLOSE DROPDOWN ================= */
 
-  useEffect(()=>{
+  /* CLOSE PROFILE DROPDOWN */
 
-    const handler=(e)=>{
+  useEffect(() => {
 
-      if(
+    const handler = (e) => {
+
+      if (
         profileRef.current &&
         !profileRef.current.contains(e.target)
-      ){
+      ) {
         setShowProfile(false);
-        setEditMode(false);
       }
 
     };
 
-    document.addEventListener("mousedown",handler);
+    document.addEventListener("mousedown", handler);
 
     return () =>
-      document.removeEventListener("mousedown",handler);
+      document.removeEventListener("mousedown", handler);
 
-  },[]);
+  }, []);
 
-  /* ================= INPUT ================= */
 
-  const handleChange=(e)=>{
+  /* LOGOUT */
 
-    setFormData({
-      ...formData,
-      [e.target.name]:e.target.value
-    });
-
-  };
-
-  /* ================= UPDATE PROFILE ================= */
-
-  const handleUpdate=async()=>{
-
-    try{
-
-      setSaving(true);
-
-      const res = await api.put(
-        "/auth/update",
-        formData
-      );
-
-      setUser(res.data);
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(res.data)
-      );
-
-      setEditMode(false);
-
-    }catch{
-      alert("Update failed");
-    }
-
-    setSaving(false);
-
-  };
-
-  /* ================= LOGOUT ================= */
-
-  const handleLogout=()=>{
+  const handleLogout = () => {
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -133,6 +78,7 @@ export default function Header({ darkMode, setDarkMode }) {
     window.location.reload();
 
   };
+
 
   const fullName =
     user?.firstName
@@ -144,62 +90,121 @@ export default function Header({ darkMode, setDarkMode }) {
       ? `${user.firstName}+${user.lastName || ""}`
       : user?.email || "User";
 
+
   return (
 
 <header className="
+
 bg-[#f8f5f1] dark:bg-[#1c1c1c]
-border-b border-[#ece6df]
-dark:border-gray-700
-shadow-sm px-6 md:px-10 py-4
-flex justify-between items-center
+
+border-b border-[#ece6df] dark:border-gray-700
+
+shadow-sm
+
+px-4 sm:px-6 md:px-10
+
+py-3 sm:py-4
+
+flex flex-wrap items-center justify-between
+
+gap-3
+
 transition-colors duration-300
+
 ">
 
 {/* LOGO */}
 
 <h1
-onClick={()=>navigate("/dashboard")}
+onClick={() => navigate("/dashboard")}
 className="
-text-2xl md:text-4xl font-serif font-bold
-text-[#3b2a21]
-dark:text-white
+
+text-xl sm:text-2xl md:text-4xl
+
+font-serif font-bold
+
+text-[#3b2a21] dark:text-white
+
 cursor-pointer
+
 hover:scale-105
+
 transition
+
 "
 >
 ⏳ Retrospect
 </h1>
 
-<div className="flex items-center gap-3 md:gap-4">
+
+
+{/* NAVIGATION */}
+
+<div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-wrap">
 
 <Link
 to="/dashboard"
 className="
-px-4 py-2 rounded-full
+
+px-3 sm:px-4
+
+py-1.5 sm:py-2
+
+rounded-full
+
+text-sm sm:text-base
+
 bg-white dark:bg-gray-800
-dark:text-white border
+
+text-[#3b2a21] dark:text-white
+
+border border-[#e5ddd5] dark:border-gray-600
+
 hover:shadow-md
+
 hover:scale-105
+
 transition
+
 "
 >
 Dashboard
 </Link>
 
-<Link
-to="/create"
+
+
+<button
+onClick={() => navigate("/journal")}
 className="
-px-4 py-2 rounded-full
-bg-white dark:bg-gray-800
-dark:text-white border
-hover:shadow-md
+
+px-4 sm:px-6
+
+py-2 sm:py-2.5
+
+rounded-full
+
+text-white
+
+text-sm sm:text-base
+
+bg-gradient-to-r
+
+from-[#7a5c4d]
+
+to-[#5a3e32]
+
+shadow-md
+
 hover:scale-105
+
 transition
+
 "
 >
-Lock a Memory
-</Link>
+📔 Journal
+</button>
+
+
 
 {/* PROFILE */}
 
@@ -209,192 +214,154 @@ ref={profileRef}
 >
 
 <div
-onClick={()=>setShowProfile(!showProfile)}
+onClick={() => setShowProfile(!showProfile)}
 className="
-flex items-center gap-2
+
+flex items-center
+
+gap-2
+
 bg-white dark:bg-gray-800
-px-3 py-1 rounded-full
-shadow cursor-pointer
+
+px-2 sm:px-3
+
+py-1
+
+rounded-full
+
+shadow
+
+cursor-pointer
+
 hover:shadow-lg
+
 hover:scale-105
+
 transition
+
 "
 >
 
 <img
 src={`https://ui-avatars.com/api/?background=b08968&color=fff&name=${avatarName}`}
-className="
-w-8 h-8 rounded-full
-transition
-hover:rotate-6
-"
+className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
 />
 
-<span className="
-text-sm
-text-[#3e2f26]
-dark:text-white
-font-medium
-">
+<span className="hidden sm:block text-sm text-[#3e2f26] dark:text-white font-medium">
 {fullName}
 </span>
 
 </div>
+
+
 
 {/* DROPDOWN */}
 
 {showProfile && (
 
 <div className="
-absolute right-0 mt-3 w-72
-bg-white/95 dark:bg-gray-900/95
-backdrop-blur-md
-rounded-xl shadow-xl
-border p-4 z-50
-animate-[fadeIn_.25s_ease]
+
+absolute right-0 mt-3
+
+w-64 sm:w-72
+
+bg-white dark:bg-gray-900
+
+rounded-xl
+
+shadow-xl
+
+border border-gray-200 dark:border-gray-700
+
+p-4
+
+z-50
+
 ">
 
-<h3 className="font-semibold dark:text-white">
-Account Details
+<h3 className="font-semibold text-[#3b2a21] dark:text-white">
+Account
 </h3>
 
-{/* VIEW MODE */}
-
-{!editMode && (
-
-<>
-
-<p className="text-sm mt-2 dark:text-gray-300">
-Name: {fullName}
+<p className="text-sm mt-2 text-gray-600 dark:text-gray-300">
+{fullName}
 </p>
 
-<p className="text-sm dark:text-gray-300">
-Email: {user?.email}
+<p className="text-sm text-gray-600 dark:text-gray-300">
+{user?.email}
 </p>
 
-<p className="text-sm dark:text-gray-300">
-Password: ********
-</p>
+<hr className="my-3 border-gray-200 dark:border-gray-700" />
+
+
+{/* PROFILE BUTTON */}
 
 <button
-onClick={()=>navigate("/profile")}
+onClick={() => navigate("/profile")}
 className="
-mt-3 text-blue-500
-text-sm font-medium
-hover:underline
-"
->
-Edit Profile
-</button>
 
-</>
+w-full
 
-)}
+text-left
 
-{/* EDIT MODE */}
+py-2
 
-{editMode && (
+text-[#3b2a21] dark:text-gray-200
 
-<div className="space-y-3 mt-3">
+hover:opacity-70
 
-<input
-name="firstName"
-value={formData.firstName}
-onChange={handleChange}
-placeholder="First Name"
-className="
-w-full border rounded-lg
-p-2 text-sm
-focus:ring-2
-focus:ring-[#b08968]
-outline-none
-dark:bg-gray-800
-"
-/>
-
-<input
-name="lastName"
-value={formData.lastName}
-onChange={handleChange}
-placeholder="Last Name"
-className="
-w-full border rounded-lg
-p-2 text-sm
-focus:ring-2
-focus:ring-[#b08968]
-outline-none
-dark:bg-gray-800
-"
-/>
-
-<input
-name="email"
-value={formData.email}
-onChange={handleChange}
-placeholder="Email"
-className="
-w-full border rounded-lg
-p-2 text-sm
-focus:ring-2
-focus:ring-[#b08968]
-outline-none
-dark:bg-gray-800
-"
-/>
-
-<input
-name="password"
-type="password"
-value={formData.password}
-onChange={handleChange}
-placeholder="New Password"
-className="
-w-full border rounded-lg
-p-2 text-sm
-focus:ring-2
-focus:ring-[#b08968]
-outline-none
-dark:bg-gray-800
-"
-/>
-
-<button
-onClick={handleUpdate}
-className="
-w-full bg-gradient-to-r
-from-[#b08968]
-to-[#a07155]
-text-white py-2
-rounded-lg
-hover:opacity-90
 transition
+
 "
 >
-
-{saving ? "Saving..." : "Save Changes"}
-
+👤 Profile
 </button>
 
-</div>
 
-)}
 
-<hr className="my-3" />
+{/* DARK MODE */}
 
 <button
-onClick={()=>setDarkMode(!darkMode)}
-className="w-full text-left py-2 hover:opacity-70 transition"
+onClick={() => setDarkMode(!darkMode)}
+className="
+
+w-full
+
+text-left
+
+py-2
+
+text-[#3b2a21] dark:text-gray-200
+
+hover:opacity-70
+
+transition
+
+"
 >
 {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
 </button>
 
+
+
+{/* LOGOUT */}
+
 <button
 onClick={handleLogout}
 className="
-w-full text-left py-2
+
+w-full
+
+text-left
+
+py-2
+
 text-red-500
+
 hover:text-red-600
+
 transition
+
 "
 >
 Logout
@@ -410,6 +377,6 @@ Logout
 
 </header>
 
-);
+  );
 
 }

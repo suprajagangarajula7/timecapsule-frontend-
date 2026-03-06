@@ -12,11 +12,19 @@ import Header from "./components/layout/Header";
 import Dashboard from "./pages/Dashboard";
 import CreateCapsule from "./pages/CreateCapsule";
 import Profile from "./pages/Profile";
+import Journal from "./pages/Journal";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
+
+  useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission();
+    }
+  }, []);
 
   /* ✅ GLOBAL THEME STATE */
   const [darkMode, setDarkMode] = useState(
@@ -37,7 +45,7 @@ export default function App() {
   return (
     <BrowserRouter>
 
-      {/* ✅ GLOBAL BACKGROUND */}
+      {/* GLOBAL BACKGROUND */}
       <div className="min-h-screen bg-[#f8f5f1] dark:bg-[#1a1a1a] transition-colors duration-300">
 
         <Routes>
@@ -50,6 +58,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />
 
+          {/* SHARE CAPSULE */}
           <Route
             path="/share/:token"
             element={
@@ -74,7 +83,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-                    {/* MEMORY DETAILS */}
+
+          {/* MEMORY DETAILS */}
           <Route
             path="/capsule/:id"
             element={
@@ -90,7 +100,7 @@ export default function App() {
             }
           />
 
-          {/* CREATE */}
+          {/* CREATE CAPSULE */}
           <Route
             path="/create"
             element={
@@ -105,24 +115,41 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* JOURNAL PAGE */}
           <Route
-  path="/profile"
-  element={
-    <ProtectedRoute>
-      <>
-        <Header
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-        />
-        <Profile
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-        />
-      </>
-    </ProtectedRoute>
-  }
-/>
-          
+            path="/journal"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                  />
+                  <Journal />
+                </>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PROFILE */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Header
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                  />
+                  <Profile
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                  />
+                </>
+              </ProtectedRoute>
+            }
+          />
 
         </Routes>
 
