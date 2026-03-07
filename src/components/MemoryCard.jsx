@@ -112,7 +112,7 @@ export default function MemoryCard({ capsule, onDelete }) {
           </p>
         ) : (
           <button
-            onClick={() => navigate(`/memory/${capsule.id}`)}
+            onClick={() => navigate(`/capsule/${capsule.id}`)}
             className="
               px-4 py-2
               text-xs sm:text-sm
