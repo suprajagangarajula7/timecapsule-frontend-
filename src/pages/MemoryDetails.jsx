@@ -6,33 +6,36 @@ export default function MemoryDetails() {
 
   const { id } = useParams();
 
-  const [capsule,setCapsule] = useState(null);
-  const [loading,setLoading] = useState(true);
-  const [enteredPassword,setEnteredPassword] = useState("");
-  const [accessGranted,setAccessGranted] = useState(false);
-  const [error,setError] = useState("");
-  const [summary,setSummary] = useState("");
+  const [capsule, setCapsule] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [enteredPassword, setEnteredPassword] = useState("");
+  const [accessGranted, setAccessGranted] = useState(false);
+  const [error, setError] = useState("");
+  const [summary, setSummary] = useState("");
 
   const playUnlockSound = () => {
     const audio = new Audio("/unlock.mp3");
-    audio.play().catch(()=>{});
+    audio.play().catch(() => {});
   };
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    const fetchCapsule = async ()=>{
-
-      try{
+    const fetchCapsule = async () => {
+      try {
 
         const res = await api.get(`/capsules/${id}`);
+        const data = res.data;
 
-        setCapsule(res.data);
+        setCapsule(data);
 
-        if(!res.data.password && new Date() >= new Date(res.data.unlock_at)){
-  setAccessGranted(true);
-}
+        const now = new Date().getTime();
+        const unlockTime = new Date(data.unlock_at).getTime();
 
-      }catch(err){
+        if (!data.password && now >= unlockTime) {
+          setAccessGranted(true);
+        }
+
+      } catch (err) {
         console.log(err);
       }
 
@@ -41,35 +44,30 @@ export default function MemoryDetails() {
 
     fetchCapsule();
 
-  },[id]);
+  }, [id]);
 
-  useEffect(() => {
-  if (!isLockedByTime && accessGranted) {
-    playUnlockSound();
-  }
-}, [accessGranted, isLockedByTime]);
-
-  if(loading)
+  if (loading)
     return <div className="p-10 text-center">Loading...</div>;
 
-  if(!capsule)
+  if (!capsule)
     return <div className="p-10 text-center">Memory not found</div>;
 
   const now = new Date().getTime();
-const unlockTime = new Date(capsule.unlock_at).getTime();
+  const unlockTime = new Date(capsule.unlock_at).getTime();
+  const isLockedByTime = now < unlockTime;
 
-const isLockedByTime = now < unlockTime;
+  useEffect(() => {
+    if (!isLockedByTime && accessGranted) {
+      playUnlockSound();
+    }
+  }, [accessGranted, isLockedByTime]);
 
   const handleUnlock = () => {
 
     if (enteredPassword === capsule.password) {
-
       setAccessGranted(true);
       setError("");
-
-      const audio = new Audio("/unlock.mp3");
-      audio.play().catch(()=>{});
-
+      playUnlockSound();
     } else {
       setError("Incorrect password");
     }
@@ -81,13 +79,13 @@ const isLockedByTime = now < unlockTime;
     if (!capsule?.message) return;
 
     const sentences = capsule.message.split(".");
-    const shortSummary = sentences.slice(0,2).join(".");
+    const shortSummary = sentences.slice(0, 2).join(".");
 
     setSummary(shortSummary);
 
   };
 
-  return(
+  return (
 
     <div className="min-h-screen flex justify-center items-center px-4 bg-[#f8f5f1] dark:bg-[#121212]">
 
@@ -97,14 +95,12 @@ const isLockedByTime = now < unlockTime;
           {capsule.title}
         </h1>
 
-        {/* LOCKED BY TIME */}
         {isLockedByTime && (
           <div className="text-red-500 mb-4">
             🔒 This memory unlocks at {new Date(capsule.unlock_at).toLocaleString()}
           </div>
         )}
 
-        {/* PASSWORD SCREEN */}
         {!isLockedByTime && capsule.password && !accessGranted && (
 
           <div className="mt-4 bg-gradient-to-br from-[#fff7ef] to-[#f8f5f1] dark:from-[#1f1f1f] dark:to-[#2a2a2a] p-6 rounded-2xl border border-[#ece6df] dark:border-gray-700">
@@ -117,13 +113,13 @@ const isLockedByTime = now < unlockTime;
               type="password"
               placeholder="Enter password"
               value={enteredPassword}
-              onChange={(e)=>setEnteredPassword(e.target.value)}
-              className="w-full border border-[#e5d5c5] dark:border-gray-600 rounded-xl px-4 py-2 bg-white dark:bg-[#1a1a1a] text-[#3e2f26] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#b08968]"
+              onChange={(e) => setEnteredPassword(e.target.value)}
+              className="w-full border border-[#e5d5c5] dark:border-gray-600 rounded-xl px-4 py-2 bg-white dark:bg-[#1a1a1a] text-[#3e2f26] dark:text-white"
             />
 
             <button
               onClick={handleUnlock}
-              className="mt-4 px-6 py-2 rounded-xl text-white bg-gradient-to-r from-[#b08968] to-[#9c6644] hover:scale-105 transition"
+              className="mt-4 px-6 py-2 rounded-xl text-white bg-gradient-to-r from-[#b08968] to-[#9c6644]"
             >
               Unlock Memory
             </button>
@@ -131,9 +127,9 @@ const isLockedByTime = now < unlockTime;
             {error && <p className="text-red-500 mt-2">{error}</p>}
 
           </div>
+
         )}
 
-        {/* CONTENT */}
         {!isLockedByTime && accessGranted && (
 
           <div className="space-y-6 mt-4">
@@ -142,10 +138,7 @@ const isLockedByTime = now < unlockTime;
               {capsule.message}
             </p>
 
-            
-
-            {/* IMAGES */}
-            {capsule.images && capsule.images.map((img,i)=>(
+            {capsule.images && capsule.images.map((img, i) => (
               <img
                 key={i}
                 src={img}
@@ -154,8 +147,7 @@ const isLockedByTime = now < unlockTime;
               />
             ))}
 
-            {/* VIDEOS */}
-            {capsule.videos && capsule.videos.map((vid,i)=>(
+            {capsule.videos && capsule.videos.map((vid, i) => (
               <video
                 key={i}
                 src={vid}
@@ -164,25 +156,19 @@ const isLockedByTime = now < unlockTime;
               />
             ))}
 
-            {/* AUDIOS */}
-            {capsule.audios && capsule.audios.map((aud,i)=>(
+            {capsule.audios && capsule.audios.map((aud, i) => (
               <div
                 key={i}
-                className="bg-[#f9f6f2] border border-[#e6ddd4] rounded-xl p-4 shadow-sm hover:shadow-md transition"
+                className="bg-[#f9f6f2] border border-[#e6ddd4] rounded-xl p-4 shadow-sm"
               >
                 <p className="text-sm text-[#6b4f3b] mb-2 font-medium">
                   🎙 Voice Memory
                 </p>
 
-                <audio
-                  src={aud}
-                  controls
-                  className="w-full"
-                />
+                <audio src={aud} controls className="w-full" />
               </div>
             ))}
 
-            {/* LOCATION */}
             {capsule.latitude && capsule.longitude && (
 
               <div>
@@ -204,26 +190,13 @@ const isLockedByTime = now < unlockTime;
 
             )}
 
-            {/* AI BUTTON */}
             <button
               onClick={generateSummary}
-              className="
-                px-6 py-2
-                rounded-xl
-                text-white
-                font-medium
-                bg-gradient-to-r
-                from-[#b08968]
-                to-[#9c6644]
-                hover:scale-105
-                hover:shadow-lg
-                transition
-              "
+              className="px-6 py-2 rounded-xl text-white bg-gradient-to-r from-[#b08968] to-[#9c6644]"
             >
               ✨ Generate AI Summary
             </button>
 
-            {/* AI SUMMARY SEPARATE CARD */}
             {summary && (
 
               <div className="mt-6 bg-gradient-to-br from-[#fff7ef] to-[#f8f5f1] dark:from-[#1f1f1f] dark:to-[#2a2a2a] p-6 rounded-2xl border border-[#ece6df] dark:border-gray-700">
