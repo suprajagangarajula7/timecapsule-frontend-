@@ -46,21 +46,24 @@ export default function MemoryDetails() {
 
   }, [id]);
 
-  if (loading)
-    return <div className="p-10 text-center">Loading...</div>;
+  /* Unlock sound effect */
+  useEffect(() => {
+    if (accessGranted) {
+      playUnlockSound();
+    }
+  }, [accessGranted]);
 
-  if (!capsule)
+  if (loading) {
+    return <div className="p-10 text-center">Loading...</div>;
+  }
+
+  if (!capsule) {
     return <div className="p-10 text-center">Memory not found</div>;
+  }
 
   const now = new Date().getTime();
   const unlockTime = new Date(capsule.unlock_at).getTime();
   const isLockedByTime = now < unlockTime;
-
-  useEffect(() => {
-    if (!isLockedByTime && accessGranted) {
-      playUnlockSound();
-    }
-  }, [accessGranted, isLockedByTime]);
 
   const handleUnlock = () => {
 
@@ -80,7 +83,6 @@ export default function MemoryDetails() {
 
     const sentences = capsule.message.split(".");
     const shortSummary = sentences.slice(0, 2).join(".");
-
     setSummary(shortSummary);
 
   };
@@ -103,9 +105,9 @@ export default function MemoryDetails() {
 
         {!isLockedByTime && capsule.password && !accessGranted && (
 
-          <div className="mt-4 bg-gradient-to-br from-[#fff7ef] to-[#f8f5f1] dark:from-[#1f1f1f] dark:to-[#2a2a2a] p-6 rounded-2xl border border-[#ece6df] dark:border-gray-700">
+          <div className="mt-4 p-6 rounded-2xl border">
 
-            <p className="text-[#7a5c4d] dark:text-gray-300 mb-4">
+            <p className="mb-4">
               🔑 This capsule is password protected
             </p>
 
@@ -114,12 +116,12 @@ export default function MemoryDetails() {
               placeholder="Enter password"
               value={enteredPassword}
               onChange={(e) => setEnteredPassword(e.target.value)}
-              className="w-full border border-[#e5d5c5] dark:border-gray-600 rounded-xl px-4 py-2 bg-white dark:bg-[#1a1a1a] text-[#3e2f26] dark:text-white"
+              className="w-full border rounded-xl px-4 py-2"
             />
 
             <button
               onClick={handleUnlock}
-              className="mt-4 px-6 py-2 rounded-xl text-white bg-gradient-to-r from-[#b08968] to-[#9c6644]"
+              className="mt-4 px-6 py-2 rounded-xl text-white bg-[#b08968]"
             >
               Unlock Memory
             </button>
@@ -134,83 +136,43 @@ export default function MemoryDetails() {
 
           <div className="space-y-6 mt-4">
 
-            <p className="text-gray-700 dark:text-gray-300">
-              {capsule.message}
-            </p>
+            <p>{capsule.message}</p>
 
             {capsule.images && capsule.images.map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                alt=""
-                className="rounded-xl w-full shadow-md"
-              />
+              <img key={i} src={img} className="rounded-xl w-full" />
             ))}
 
             {capsule.videos && capsule.videos.map((vid, i) => (
-              <video
-                key={i}
-                src={vid}
-                controls
-                className="w-full rounded-xl shadow-md"
-              />
+              <video key={i} src={vid} controls className="w-full rounded-xl" />
             ))}
 
             {capsule.audios && capsule.audios.map((aud, i) => (
-              <div
-                key={i}
-                className="bg-[#f9f6f2] border border-[#e6ddd4] rounded-xl p-4 shadow-sm"
-              >
-                <p className="text-sm text-[#6b4f3b] mb-2 font-medium">
-                  🎙 Voice Memory
-                </p>
-
-                <audio src={aud} controls className="w-full" />
-              </div>
+              <audio key={i} src={aud} controls className="w-full" />
             ))}
 
             {capsule.latitude && capsule.longitude && (
-
-              <div>
-
-                <p className="font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  📍 Location
-                </p>
-
-                <iframe
-                  title="map"
-                  width="100%"
-                  height="300"
-                  className="rounded-xl"
-                  loading="lazy"
-                  src={`https://maps.google.com/maps?q=${capsule.latitude},${capsule.longitude}&z=15&output=embed`}
-                ></iframe>
-
-              </div>
-
+              <iframe
+                title="map"
+                width="100%"
+                height="300"
+                src={`https://maps.google.com/maps?q=${capsule.latitude},${capsule.longitude}&z=15&output=embed`}
+              />
             )}
 
             <button
               onClick={generateSummary}
-              className="px-6 py-2 rounded-xl text-white bg-gradient-to-r from-[#b08968] to-[#9c6644]"
+              className="px-6 py-2 rounded-xl text-white bg-[#b08968]"
             >
               ✨ Generate AI Summary
             </button>
 
             {summary && (
-
-              <div className="mt-6 bg-gradient-to-br from-[#fff7ef] to-[#f8f5f1] dark:from-[#1f1f1f] dark:to-[#2a2a2a] p-6 rounded-2xl border border-[#ece6df] dark:border-gray-700">
-
-                <h2 className="text-lg font-semibold mb-3 text-[#3e2f26] dark:text-white">
+              <div className="p-6 border rounded-2xl">
+                <h2 className="font-semibold mb-3">
                   ✨ AI Memory Summary
                 </h2>
-
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {summary}
-                </p>
-
+                <p>{summary}</p>
               </div>
-
             )}
 
           </div>
@@ -222,5 +184,4 @@ export default function MemoryDetails() {
     </div>
 
   );
-
 }
