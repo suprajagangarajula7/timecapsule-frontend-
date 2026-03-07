@@ -20,18 +20,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
 
-  useEffect(() => {
-    if ("Notification" in window) {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  /* ✅ GLOBAL THEME STATE */
+  /* THEME STATE */
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
 
-  /* ✅ APPLY THEME TO HTML */
+  /* APPLY THEME */
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -45,12 +39,11 @@ export default function App() {
   return (
     <BrowserRouter>
 
-      {/* GLOBAL BACKGROUND */}
       <div className="min-h-screen bg-[#f8f5f1] dark:bg-[#1a1a1a] transition-colors duration-300">
 
         <Routes>
 
-          {/* PUBLIC ROUTES */}
+          {/* PUBLIC */}
           <Route path="/" element={<AuthHome />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -58,7 +51,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />
 
-          {/* SHARE CAPSULE */}
+          {/* SHARE */}
           <Route
             path="/share/:token"
             element={
@@ -100,7 +93,7 @@ export default function App() {
             }
           />
 
-          {/* CREATE CAPSULE */}
+          {/* CREATE */}
           <Route
             path="/create"
             element={
@@ -116,7 +109,7 @@ export default function App() {
             }
           />
 
-          {/* JOURNAL PAGE */}
+          {/* JOURNAL */}
           <Route
             path="/journal"
             element={
