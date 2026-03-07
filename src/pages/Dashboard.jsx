@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import MemoryCard from "../components/MemoryCard";
@@ -8,7 +7,6 @@ export default function Dashboard() {
 
   const [capsules, setCapsules] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [notifiedCapsules, setNotifiedCapsules] = useState([]);
 
   const navigate = useNavigate();
 
@@ -20,10 +18,6 @@ export default function Dashboard() {
       navigate("/");
     } else {
       fetchCapsules();
-    }
-
-    if ("Notification" in window) {
-      Notification.requestPermission();
     }
 
   }, []);
@@ -46,43 +40,6 @@ export default function Dashboard() {
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const playTimerSound = () => {
-    const audio = new Audio("/timer-end.mp3");
-    audio.play().catch(() => {});
-  };
-
-
-  const checkUnlockedCapsules = async () => {
-
-    try {
-
-      const res = await api.get("/capsules");
-
-      res.data.forEach((capsule) => {
-
-        const now = new Date();
-        const unlockTime = new Date(capsule.unlock_at);
-
-        if (
-          now >= unlockTime &&
-          !notifiedCapsules.includes(capsule.id)
-        ) {
-
-          playTimerSound();
-          showUnlockNotification(capsule.title);
-
-          setNotifiedCapsules(prev => [...prev, capsule.id]);
-
-        }
-
-      });
-
-    } catch (err) {
-      console.log(err);
-    }
-
   };
 
   if (loading) {
