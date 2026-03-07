@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* ---------- COUNTDOWN ---------- */
@@ -17,51 +17,21 @@ export default function MemoryCard({ capsule, onDelete }) {
 
   const navigate = useNavigate();
 
-  const images =
-    typeof capsule.images === "string"
-      ? JSON.parse(capsule.images)
-      : capsule.images || [];
-
   const [time, setTime] = useState(
     getRemainingTime(capsule.unlock_at)
   );
-
-  const notified = useRef(false);
-
-  /* ---------- NOTIFICATION ---------- */
-  useEffect(() => {
-    if ("Notification" in window) {
-      Notification.requestPermission();
-    }
-  }, []);
 
   /* ---------- TIMER ---------- */
   useEffect(() => {
 
     const timer = setInterval(() => {
-
-      const remaining =
-        getRemainingTime(capsule.unlock_at);
-
+      const remaining = getRemainingTime(capsule.unlock_at);
       setTime(remaining);
-
-      if (
-        remaining.total <= 0 &&
-        !notified.current &&
-        Notification.permission === "granted"
-      ) {
-        new Notification("🎉 Memory Unlocked!", {
-          body: `${capsule.title} is now open!`,
-        });
-
-        notified.current = true;
-      }
-
     }, 1000);
 
     return () => clearInterval(timer);
 
-  }, [capsule.unlock_at, capsule.title]);
+  }, [capsule.unlock_at]);
 
   /* ---------- SHARE ---------- */
   const shareCapsule = async () => {
@@ -102,43 +72,47 @@ export default function MemoryCard({ capsule, onDelete }) {
     >
 
       {/* TITLE */}
-      <h2 className="
+      <h2
+        className="
         text-lg sm:text-xl md:text-2xl
         font-serif
         text-[#3e2f26]
         dark:text-white
         break-words
-      ">
+      "
+      >
         {capsule.title}
       </h2>
 
       {/* DATE */}
-      <p className="
+      <p
+        className="
         text-xs sm:text-sm
         text-[#7a5c4d]
         dark:text-gray-400
-      ">
-        Unlocked on{" "}
-        {new Date(
-          capsule.unlock_at
-        ).toLocaleString()}
+      "
+      >
+        Unlocks on{" "}
+        {new Date(capsule.unlock_at).toLocaleString()}
       </p>
 
       {/* TIMER */}
       <div>
 
         {time.total > 0 ? (
-          <p className="
+          <p
+            className="
             font-medium
             text-xs sm:text-sm
             text-[#a07155]
             dark:text-[#d4a373]
-          ">
+          "
+          >
             🔒 {time.days}d {time.hours}h {time.minutes}m {time.seconds}s
           </p>
         ) : (
           <button
-            onClick={() => navigate(`/capsule/${capsule.id}`)}
+            onClick={() => navigate(`/memory/${capsule.id}`)}
             className="
               px-4 py-2
               text-xs sm:text-sm
@@ -159,12 +133,14 @@ export default function MemoryCard({ capsule, onDelete }) {
       </div>
 
       {/* ACTIONS */}
-      <div className="
+      <div
+        className="
         flex
         flex-wrap
         gap-2
         mt-2
-      ">
+      "
+      >
 
         <button
           onClick={() => onDelete(capsule.id)}
