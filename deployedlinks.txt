@@ -1,0 +1,2 @@
+Frontend deployement link: https://timecapsule-frontend-gilt.vercel.app/
+Backendend deployement link: https://timecapsule-backend-6ekt.onrender.com
