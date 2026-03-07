@@ -28,9 +28,9 @@ export default function MemoryDetails() {
 
         setCapsule(res.data);
 
-        if(!res.data.password){
-          setAccessGranted(true);
-        }
+        if(!res.data.password && new Date() >= new Date(res.data.unlock_at)){
+  setAccessGranted(true);
+}
 
       }catch(err){
         console.log(err);
@@ -44,18 +44,21 @@ export default function MemoryDetails() {
   },[id]);
 
   useEffect(() => {
-
-    if (!capsule?.is_locked && accessGranted) {
-      playUnlockSound();
-    }
-
-  }, [accessGranted]);
+  if (!isLockedByTime && accessGranted) {
+    playUnlockSound();
+  }
+}, [accessGranted, isLockedByTime]);
 
   if(loading)
     return <div className="p-10 text-center">Loading...</div>;
 
   if(!capsule)
     return <div className="p-10 text-center">Memory not found</div>;
+
+  const now = new Date().getTime();
+const unlockTime = new Date(capsule.unlock_at).getTime();
+
+const isLockedByTime = now < unlockTime;
 
   const handleUnlock = () => {
 
@@ -95,14 +98,14 @@ export default function MemoryDetails() {
         </h1>
 
         {/* LOCKED BY TIME */}
-        {capsule.is_locked && (
+        {isLockedByTime && (
           <div className="text-red-500 mb-4">
             🔒 This memory unlocks at {new Date(capsule.unlock_at).toLocaleString()}
           </div>
         )}
 
         {/* PASSWORD SCREEN */}
-        {!capsule.is_locked && capsule.password && !accessGranted && (
+        {!isLockedByTime && capsule.password && !accessGranted && (
 
           <div className="mt-4 bg-gradient-to-br from-[#fff7ef] to-[#f8f5f1] dark:from-[#1f1f1f] dark:to-[#2a2a2a] p-6 rounded-2xl border border-[#ece6df] dark:border-gray-700">
 
@@ -131,7 +134,7 @@ export default function MemoryDetails() {
         )}
 
         {/* CONTENT */}
-        {!capsule.is_locked && accessGranted && (
+        {!isLockedByTime && accessGranted && (
 
           <div className="space-y-6 mt-4">
 

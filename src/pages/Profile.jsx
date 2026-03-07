@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
 
@@ -10,6 +11,7 @@ export default function Profile() {
     password:""
   });
 
+  const navigate = useNavigate();
   const [loading,setLoading] = useState(true);
   const [saving,setSaving] = useState(false);
 
@@ -59,37 +61,41 @@ export default function Profile() {
 
   /* ================= UPDATE PROFILE ================= */
 
-  const handleSubmit=async(e)=>{
+  const handleSubmit = async (e) => {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    try{
+  try {
 
-      setSaving(true);
+    setSaving(true);
 
-      const res = await api.put(
-        "/auth/update-profile",
-        formData
-      );
+    const res = await api.put(
+      "/auth/update-profile",
+      formData
+    );
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(res.data)
-      );
+    localStorage.setItem(
+      "user",
+      JSON.stringify(res.data)
+    );
 
-      alert("Profile Updated Successfully 🎉");
+    alert("Profile Updated Successfully 🎉");
 
-      window.location.reload();
+    // logout user and go to login
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-    }catch{
+    navigate("/login");
 
-      alert("Update failed");
+  } catch (err) {
 
-    }
+    console.error(err);
+    alert("Update failed");
 
-    setSaving(false);
+  }
 
-  };
+  setSaving(false);
+};
 
 
   if(loading)
