@@ -108,7 +108,7 @@ export default function MemoryDetails() {
           <div className="mt-4 p-6 rounded-2xl border">
 
             <p className="mb-4">
-              🔑 This capsule is password protected
+              🔑 This memory is password protected
             </p>
 
             <input
