@@ -77,16 +77,23 @@ export default function MemoryDetails() {
 
   };
 
-  const generateSummary = () => {
+const generateSummary = async () => {
 
-    if (!capsule?.message) return;
+  try {
 
-    const sentences = capsule.message.split(".");
-    const shortSummary = sentences.slice(0, 2).join(".");
-    setSummary(shortSummary);
+    const res = await api.post("/api/ai/summary", {
+      text: capsule.message
+    });
 
-  };
+    setSummary(res.data.summary);
 
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
   return (
 
     <div className="min-h-screen flex justify-center items-center px-4 bg-[#f8f5f1] dark:bg-[#121212]">
