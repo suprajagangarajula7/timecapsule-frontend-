@@ -81,7 +81,7 @@ const generateSummary = async () => {
 
   try {
 
-    const res = await api.post("/api/ai/summary", {
+    const res = await api.post("/ai/summary", {
       text: capsule.message
     });
 
