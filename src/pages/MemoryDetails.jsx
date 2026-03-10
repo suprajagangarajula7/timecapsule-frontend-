@@ -77,21 +77,11 @@ export default function MemoryDetails() {
 
   };
 
-const generateSummary = async () => {
+const generateSummary = () => {
 
-  try {
-
-    const res = await api.post("/ai/summary", {
-      text: capsule.message
-    });
-
-    setSummary(res.data.summary);
-
-  } catch (error) {
-
-    console.log(error);
-
-  }
+  const sentences = capsule.message.split(".");
+  const shortSummary = sentences.slice(0, 2).join(".");
+  setSummary(shortSummary);
 
 };
   return (
